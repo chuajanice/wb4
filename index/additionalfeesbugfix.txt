@@ -1,0 +1,135 @@
+index/functions.py:1052-1127 — replace add_additionalFees() with:
+def add_additionalFees():
+    """
+    Generate the next monthly Additional Fees billing transaction.
+
+    IMPORTANT: this must NOT touch month_counter. month_counter represents the
+    number of installments actually PAID and may only be changed when an
+    AdditionalFeesPayment is recorded (see addfee_paymentmethod / payment).
+    Generation progress is tracked through the fee's linked transactions so a
+    newly generated installment is never shown as paid.
+    """
+    today = datetime.today()
+
+    consumers = ConsumerInfo.objects.all()
+
+    for c in consumers:
+        try:
+            addfees = AdditionalFees.objects.filter(consumer_id=c.consumer_id)
+        except ObjectDoesNotExist:
+            continue
+
+        for addfee in addfees:
+            # Only process if there is at least one payment for this fee
+            if not addfee.payments.exists():
+                continue
+
+            # Number of installments already generated for this fee
+            generated = addfee.transactions.count()
+
+            # Get last transaction for this additional fee
+            last_af_qs = addfee.transactions.order_by('-year', '-month')
+            last_af = last_af_qs.first() if last_af_qs.exists() else None
+
+            # Determine month and year for new transaction
+            if last_af:
+                month = last_af.month + 1
+                year = last_af.year
+                if month == 13:
+                    month = 1
+                    year += 1
+            else:
+                month = today.month
+                year = today.year
+
+            # Generate the next monthly installment (does not mark it paid)
+            if generated < addfee.months:
+                afbill = Transactions()
+                afbill.acctID = c
+                afbill.transType = "Additional Fees"
+                afbill.date = today
+                afbill.month = month
+                afbill.year = year
+                afbill.processedBy = 'System'
+                afbill.bill = addfee.amount
+                afbill.save()
+
+                addfee.transactions.add(afbill)
+
+                c.current_bal += addfee.amount
+                c.save()
+
+            # Handle remainder exactly once, after all monthly installments exist
+            elif generated == addfee.months and addfee.remainder:
+                afbill = Transactions()
+                afbill.acctID = c
+                afbill.transType = "Additional Fees"
+                afbill.date = today
+                afbill.month = month
+                afbill.year = year
+                afbill.processedBy = 'System'
+                afbill.bill = addfee.remainder
+                afbill.save()
+
+                addfee.transactions.add(afbill)
+
+                c.current_bal += addfee.remainder
+                c.save()
+index/views.py:1943-1962 — replace the Additional Fee block in payment() with:
+            # If this is an Additional Fee, also update the associated AdditionalFee (working)
+            if transtype == "Additional Fee":
+                try:
+                    addfee = AdditionalFees.objects.get(feeid=transid)
+                except AdditionalFees.DoesNotExist:
+                    continue
+
+                # Never mark more installments paid than the fee actually has
+                if addfee.month_counter >= addfee.months:
+                    continue
+
+                addfee.month_counter += 1
+                addfee.save()
+
+                AdditionalFeesPayment.objects.create(
+                    additional_fee=addfee,
+                    amount=addfee.amount,
+                    remarks="Paid through Pay in Ledger - " + str(or_num),
+                    processedBy=request.user.username
+                )
+index/views.py:2027-2062 — replace addfee_paymentmethod() with:
+def addfee_paymentmethod(request, id):
+    if request.method == "POST":
+        addfee = get_object_or_404(AdditionalFees, feeid=id)
+
+        remarks = request.POST.get("remarks", "")
+        payment_type = request.POST.get("payment_type", "monthly")
+
+        # Number of installments still unpaid
+        remaining = max(addfee.months - addfee.month_counter, 0)
+        if remaining == 0:
+            # Already fully paid, do not record another payment or bump the counter
+            return redirect('additionalfeeslist', consumer_id=addfee.consumer_id.consumer_id)
+
+        # How many installments this payment covers
+        if payment_type == "full":
+            months_paid = remaining
+        else:
+            months_paid = 1
+
+        amount = addfee.amount * months_paid
+
+        # Create and save the payment
+        AdditionalFeesPayment.objects.create(
+            additional_fee=addfee,
+            amount=amount,
+            remarks=remarks,
+            processedBy=request.user.username
+        )
+
+        # month_counter only ever reflects real, recorded payments
+        addfee.month_counter = min(addfee.month_counter + months_paid, addfee.months)
+        addfee.save()
+
+        return redirect('additionalfeeslist', consumer_id=addfee.consumer_id.consumer_id)
+
+    return HttpResponseNotAllowed(['POST'])
