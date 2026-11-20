@@ -104,7 +104,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'waterbillingv3',
         'USER': 'root',
-        'PASSWORD': 'jazfer',
+        'PASSWORD': '12345',
         'HOST': 'localhost',
         'PORT': '3306'
     }

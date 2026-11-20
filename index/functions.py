@@ -712,7 +712,7 @@ def dump_database():
     #Changed by Bandajon k., 
     cnx = MySQLdb.connect(
         user='root',
-        password='jazfer',
+        password='12345',
         host='localhost',
         port=3306,
         db='waterbillingv3',
@@ -1051,8 +1051,13 @@ def pay_saall():
 
 def add_additionalFees():
     """
-    Auto-increment Additional Fees only if a payment exists.
-    Uses the real current date.
+    Generate the next monthly Additional Fees billing transaction.
+
+    IMPORTANT: this must NOT touch month_counter. month_counter represents the
+    number of installments actually PAID and may only be changed when an
+    AdditionalFeesPayment is recorded (see addfee_paymentmethod / payment).
+    Generation progress is tracked through the fee's linked transactions so a
+    newly generated installment is never shown as paid.
     """
     today = datetime.today()
 
@@ -1068,6 +1073,9 @@ def add_additionalFees():
             # Only process if there is at least one payment for this fee
             if not addfee.payments.exists():
                 continue
+
+            # Number of installments already generated for this fee
+            generated = addfee.transactions.count()
             
             # Get last transaction for this additional fee
             last_af_qs = addfee.transactions.order_by('-year', '-month')
@@ -1084,8 +1092,8 @@ def add_additionalFees():
                 month = today.month
                 year = today.year
 
-            # Only increment if month_counter < total months
-            if addfee.month_counter < addfee.months:
+            # Generate the next monthly installment (does not mark it paid)
+            if generated < addfee.months:
                 afbill = Transactions()
                 afbill.acctID = c
                 afbill.transType = "Additional Fees"
@@ -1097,14 +1105,12 @@ def add_additionalFees():
                 afbill.save()
 
                 addfee.transactions.add(afbill)
-                addfee.month_counter += 1
-                addfee.save()
 
                 c.current_bal += addfee.amount
                 c.save()
 
-            # Handle remainder if months finished
-            elif addfee.remainder:
+            # Handle remainder exactly once, after all monthly installments exist
+            elif generated == addfee.months and addfee.remainder:
                 afbill = Transactions()
                 afbill.acctID = c
                 afbill.transType = "Additional Fees"
@@ -1116,7 +1122,6 @@ def add_additionalFees():
                 afbill.save()
 
                 addfee.transactions.add(afbill)
-                addfee.save()
 
                 c.current_bal += addfee.remainder
                 c.save()

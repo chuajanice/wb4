@@ -10,7 +10,7 @@ import pickle
 # === DATABASE CONFIG === (must match wb2/wb2/settings.py DATABASES)
 DB_NAME = "waterbillingv3"
 DB_USER = "root"
-DB_PASSWORD = "jazfer"
+DB_PASSWORD = "12345"
 DB_HOST = "127.0.0.1"
 DB_PORT = "3306"
 

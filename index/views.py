@@ -1944,20 +1944,22 @@ def payment(request, id):
             if transtype == "Additional Fee":
                 try:
                     addfee = AdditionalFees.objects.get(feeid=transid)
-                    addfee.month_counter += 1
-                    addfee.save()
-                    print ("It Worked")
-
-                    payment = AdditionalFeesPayment(
-                        additional_fee=addfee,
-                        amount=addfee.amount,
-                        remarks="Paid through Pay in Ledger -" + str(or_num),
-                        processedBy=request.user.username  
-                    )
-                    payment.save()
                 except AdditionalFees.DoesNotExist:
-                    print ("It Didn't")
-                    pass
+                    continue
+
+                # Never mark more installments paid than the fee actually has
+                if addfee.month_counter >= addfee.months:
+                    continue
+
+                addfee.month_counter += 1
+                addfee.save()
+
+                AdditionalFeesPayment.objects.create(
+                    additional_fee=addfee,
+                    amount=addfee.amount,
+                    remarks="Paid through Pay in Ledger - " + str(or_num),
+                    processedBy=request.user.username
+                )
                 
 
         # Apply Discount if code is valid
@@ -2026,33 +2028,34 @@ def addfee_paymentmethod(request, id):
     if request.method == "POST":
         addfee = get_object_or_404(AdditionalFees, feeid=id)
 
-        try:
-            amount = float(request.POST.get("amount", 0))
-            remarks = request.POST.get("remarks", "")
-            payment_type = request.POST.get("payment_type", "monthly")  # optional if passed
-        except (TypeError, ValueError):
+        remarks = request.POST.get("remarks", "")
+        payment_type = request.POST.get("payment_type", "monthly")
+
+        # Number of installments still unpaid
+        remaining = max(addfee.months - addfee.month_counter, 0)
+        if remaining == 0:
+            # Already fully paid, do not record another payment or bump the counter
             return redirect('additionalfeeslist', consumer_id=addfee.consumer_id.consumer_id)
 
+        # How many installments this payment covers
+        if payment_type == "full":
+            months_paid = remaining
+        else:
+            months_paid = 1
+
+        amount = addfee.amount * months_paid
+
         # Create and save the payment
-        payment = AdditionalFeesPayment(
+        AdditionalFeesPayment.objects.create(
             additional_fee=addfee,
             amount=amount,
             remarks=remarks,
-            processedBy=request.user.username  
+            processedBy=request.user.username
         )
-        payment.save()
 
-        # Update the month counter if it's a monthly payment
-        if payment_type == "monthly":
-            addfee.month_counter += 1
-        elif payment_type == "full":
-            remaining = addfee.months - addfee.month_counter
-            addfee.month_counter += remaining
-
+        # month_counter only ever reflects real, recorded payments
+        addfee.month_counter = min(addfee.month_counter + months_paid, addfee.months)
         addfee.save()
-
-        #cons = get_object_or_404(ConsumerInfo, consumer_id = addfee.consumer_id)
-        # add something that
 
         return redirect('additionalfeeslist', consumer_id=addfee.consumer_id.consumer_id)
     
