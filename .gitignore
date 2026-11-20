@@ -1,0 +1,24 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Credentials
+service_key.json
+service_key.json.dead
+credentials.json
+credentials.json.dead
+token.json
+token*.pkl
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Local editor settings
+.vscode/token.pkl.old
+.vscode/
+
+token.pkl
+token.pkl.old
+token*.pkl

@@ -1,0 +1,229 @@
+{% load humanize %}
+{% load static %}
+<style>
+    /* Water bill theme styles */
+    .hide {
+        opacity: 0;
+        transition: 0.3s all ease-in-out;
+    }
+
+    .showOnHover:hover .hide {
+        opacity: 1;
+        transition: 0.3s all ease-in-out;
+    }
+
+    .invoice-box {
+        max-width: 700px; /* wider for A4 */
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #000;
+        box-shadow: 0 0 10px rgb(0 0 0 / 15%);
+        font-size: 14px;
+        line-height: 18px;
+        font-family: monospace;
+        color: #000;
+        background: #fff;
+    }
+
+    .invoice-box table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    .invoice-box table td {
+        padding: 6px;
+        vertical-align: top;
+    }
+
+    .invoice-box table tr td:nth-child(2) {
+        text-align: right;
+    }
+
+    .invoice-box table tr.top td.title {
+        font-size: 45px;
+        line-height: 45px;
+        color: #000;
+    }
+
+    .invoice-box table tr.heading td {
+        background: #eee;
+        border-bottom: 1px solid #ddd;
+        font-weight: bold;
+    }
+
+    .invoice-box table tr.item td {
+        border-bottom: 1px solid #eee;
+    }
+
+    .invoice-box table tr.item.last td {
+        border-bottom: none;
+    }
+
+    .invoice-box table tr.total td:nth-child(2) {
+        border-top: 2px solid #eee;
+        font-weight: bold;
+    }
+
+    @media only screen and (max-width: 600px) {
+        .invoice-box table tr.top td,
+        .invoice-box table tr.information td {
+            width: 100%;
+            display: block;
+            text-align: center;
+        }
+    }
+
+    #logo {
+        vertical-align: middle;
+        border-style: none;
+        height: 90px;
+    }
+
+    .total {
+        font-weight: bold;
+        color: blue;
+        border: 1px solid black;
+    }
+
+    .mun {
+        font-family: monospace;
+        font-size: 25px;
+        font-weight: bold;
+    }
+
+    .st {
+        font-size: 21px;
+        font-weight: bold;
+        font-family: emoji;
+    }
+
+    .custom-color {
+        background-color: #aca9a9b7;
+        color: #000000;
+    }
+
+    .footer {
+        text-align: center;
+        padding-top: 10px;
+        font-size: 13px;
+        color: rgb(255, 0, 0);
+        border-top: 1px solid #ccc;
+        margin-top: 20px;
+    }
+
+    .border-custom {
+        border-color: #000000bd !important;
+    }
+
+    .underThick {
+        text-decoration: none;
+        border-bottom: 2px solid #000;
+    }
+    .small-table td, 
+    .small-table th {
+        font-size: 12px;   /* You can change to 11px or 10px if you want it smaller */
+        padding: 4px;      /* Tightens up spacing a bit */
+    }
+
+</style>
+
+<!-- Water Billing Layout -->
+<div style="display:none;" class="billing">
+    <div id="invoice">
+        <div class="invoice-box">
+            <table cellpadding="0" cellspacing="0">
+                <tbody>
+                    <!-- Header Section -->
+                    <tr class="top">
+                        <td colspan="2">
+                            <div style="display: flex; justify-content: space-between; align-items: center; text-align: center;">
+                                <img src="{% static 'images/lgulogo.png' %}" alt="Left Logo" style="height: 60px;">
+                                
+                                <div style="flex: 1;">
+                                    <p class="mun" style="margin: 0;">Water Bill</p>
+                                    <h6 style="color: #423e3e; display: block; margin-top: 5px;">
+                                        <i>Municipality of Ginatilan</i>
+                                    </h6>
+                                </div>
+
+                                <img src="{% static 'images/logopilipinas.png' %}" alt="Right Logo" style="height: 70px;">
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Customer Info -->
+                    <tr class="information">
+                        <td colspan="2">
+                            <table>
+                                <tr>
+                                    <td>
+                                        <h6><b>Name:</b> <u class="underThick">{{u.firstname}} {{u.middlename}} {{u.lastname}}</u></h6>
+                                        <h6><b>Account ID:</b> <u class="underThick">{{u.consumer_id}}</u></h6>
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <h6><b>Meter Number:</b> <u class="underThick">{{u.meternumber}}</u></h6>
+                                        <h6><b>Address:</b> <u class="underThick">{{u.installation_address}}</u></h6>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Unpaid List Table -->
+            <table class="table table-bordered border-custom small-table">
+                <thead class="custom-color">
+                    <tr>
+                        <th>No.</th>
+                        <th>Type</th>
+                        <th>Month</th>
+                        <th>Usage</th>
+                        <th>Amount Due</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in unpaid_list %}
+                    <tr>
+                        <td class="text-center">{{ forloop.counter }}</td>
+                        <td class="text-center">{{ entry.transType }}</td>
+                        <td class="text-center">{{ entry.month }} - {{ entry.year }}</td>
+                        <td class="text-center">{{ entry.usage|default:"-" }}</td>
+                        <td class="text-center">PHP {{ entry.amount_due|floatformat:2|intcomma }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Total -->
+            <div style="text-align:right; margin-top:10px;">
+                <h6>
+                    <b>Total Balance:</b>
+                    <u class="underThick" style="font-weight: bold; font-size: 18px;">
+                        PHP {{ total_balance|floatformat:2|intcomma }}
+                    </u>
+                </h6>
+            </div>
+
+            <div class="footer">
+                Date Issued: {{date_today}}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script For Invoice -->
+<script>
+    function print() {
+        const invoice = document.getElementById("invoice");
+        var opt = {
+            margin: [0.4, 0.3, 0.4, 0.3],
+            filename: '{{u.firstname}}_{{u.lastname}}_bill.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().from(invoice).set(opt).save();
+    }
+</script>

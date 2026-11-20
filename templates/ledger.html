@@ -1,0 +1,683 @@
+{% extends 'dashboard.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}
+Account Ledger
+{% endblock title %}
+
+{% block ledger %}
+<!-- Scripts -->
+<script src="{% static 'jquery.min.js' %}"></script>
+<script src="{% static 'jspdf.min.js' %}"></script>
+<script src="{% static 'html2pdf.bundle.min.js' %}"></script>
+<script src="{% static 'jspdf.plugin.autotable.js' %}"></script>
+<script src="{% static 'bootstrap.min.js' %}"></script>
+<script src="{% static 'popper.min.js' %}"></script>
+
+<style>
+    .hide {
+        opacity: 0;
+        transition: 0.3s all ease-in-out;
+    }
+
+    .showOnHover:hover .hide {
+        opacity: 1;
+    }
+
+    .button2 {
+        background-color: var(--main-color);
+        color: white;
+        padding: 8px 30px;
+        border: none;
+        border-radius: 15px;
+        box-shadow: inset 0px -8px 7px 0 rgba(0, 0, 0, 0.24), inset 0px 5px 7px 0 rgba(255, 255, 255, 0.52), 0px 6px 6px 0 rgba(0, 0, 0, 0.19);
+        transition: all ease 0.3s;
+    }
+
+    .btn.button2:hover,
+    .btn.button2:focus {
+        background: var(--main-color);
+        color: #ffffff;
+        border-radius: 30px;
+        box-shadow: inset 0px -8px 7px rgba(0, 0, 0, 0.39), inset 0px 5px 7px #e6ecebd8;
+    }
+
+    .table-orange {
+        background-color: #ffd8a9;
+        color: black;
+    }
+
+    .table-red {
+        background-color: #ff7272;
+        color: white;
+    }
+
+    .table-blue {
+        background-color: #a9d8ff;
+        color: black;
+    }
+
+    .table-yellow {
+        background-color: #fffaa9;
+        color: black;
+    }
+
+    .table-lightblue {
+        background-color: #a9e6ff;
+        color: black;
+    }
+
+    .row-bill {
+        background-color: #daffc6 !important;
+    }
+
+    .row-addfee {
+        background-color: #aaebee !important;
+    }
+
+    .row-reset {
+        background-color: #ffc6d0 !important;
+    }
+
+    .row-default {
+        background-color: #ffffff;
+    }
+
+    /* Responsive and clean table styling */
+    .table-responsive table {
+        width: 100%;
+        table-layout: auto;
+        border-collapse: collapse;
+    }
+
+    .table th, .table td {
+        padding: 0.6rem 0.8rem;
+        white-space: nowrap;
+        text-align: left;
+        vertical-align: middle;
+        border: 1px solid #ccc;
+        font-size: 17px;
+    }
+
+    /* Header styling */
+    .table thead th {
+        background-color: #006778; /* Teal */
+        color: white;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    /* Alternating row colors */
+    .table-striped tbody tr:nth-child(odd) {
+        background-color: #ffffff;
+    }
+
+    .table-striped tbody tr:nth-child(even) {
+        background-color: #dadada; /* Light gray */
+    }
+
+    /* Optional hover effect */
+    .table-hover tbody tr:hover {
+        background-color: #e6f7f8;
+    }
+
+    .table-scroll-vertical {
+        max-height: 550px; /* Adjust height to show ~10 rows */
+        overflow-y: auto;
+    }
+
+    /* Clickable Transaction ID styling */
+    .clickable-trans-id {
+        cursor: pointer;
+        color: #0066cc;
+        text-decoration: underline;
+        font-weight: 600;
+    }
+
+    .clickable-trans-id:hover {
+        background-color: #e6f7f8 !important;
+        color: #004080;
+    }
+</style>
+
+<!-- Consumer Info Table -->
+<div class="container-fluid p-0">
+    <div class="table-responsive">  
+        <table class="table table-bordered">
+            <thead class="wb_thead">
+                <tr class="header">
+                    <th>Account ID</th>
+                    <th>Name</th>
+                    <th>Connection Type</th>
+                    <th>Meter Number</th>
+                    <th>Current Reading</th>
+                    <th>Excess Payment</th>
+                    <th>Payable</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody class="wb_tbody">
+                <tr class="showOnHover">
+                    <td class="table-light text-center">{{ u.consumer_id }}</td>
+                    <td class="table-light text-center">{{ u.firstname }} {{ u.middlename }} {{ u.lastname }}</td>
+                    <td class="table-light text-center">{{ u.contypeid.contype }}</td>
+                    <td class="table-light text-center">{{ u.meternumber }}</td>
+                    <td class="table-light text-center">{{ u.current_reading }}</td>
+                    <td class="table-light text-center">&#8369; {{ u.excess|floatformat:2|intcomma }}</td>
+                    <td class="table-light text-center">&#8369; {{ billbalance|floatformat:2|intcomma }}</td>
+                    <td class="table-light text-center">
+                        {% if not ispaid %}
+                        <button title="Payment" class="btn btn-success btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#payment" style="width: 66px;">Pay</button>
+                        {% endif %}
+                        <button type="button" class="btn btn-primary btn-sm" onclick="print()">Get Bill</button>
+                        
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal fade" id="payment" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <form action="{% url 'payment' u.consumer_id %}" method="post">
+            <div class="modal-content">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Select Transactions to Pay</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="d-flex flex-column align-items-center mb-4">
+                        <div class="mb-2 w-75">
+                            <label for="id_or_num" class="form-label mb-1" style="font-size: 14px;">O.R. Number</label>
+                            <input type="text" name="or_num" id="id_or_num" class="form-control text-center"
+                                style="font-size: 14px;" required>
+                        </div>
+                        <div class="mb-2 w-75">
+                            <label for="id_dis_code" class="form-label mb-1" style="font-size: 14px;">Discount Code
+                                (optional)</label>
+                            <input type="text" name="dis_code" id="id_dis_code" class="form-control text-center"
+                                style="font-size: 14px;">
+                        </div>
+                    </div>
+
+                    <label class="form-label">Select Unpaid Transactions</label>
+                    <!-- Warning Message Placeholder -->
+                    <div id="warningMessage" class="alert alert-danger py-1 px-2 mb-3 d-none" role="alert" style="font-size: 14px;">
+                        Please select at least one transaction to pay.
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th></th>
+                                    <th>Transaction ID</th>
+                                    <th>Type</th>
+                                    <th>Month-Year</th>
+                                    <th>Amount Due</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in unpaid_list %}
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="trans-checkbox" data-amount="{{ item.amount_due }}" name="selected_trans"
+                                            value="{{ item.transid }}|{{ item.transType }}">
+                                    </td>
+                                    <td>{{ item.transid }}</td>
+                                    <td>{{ item.transType }}</td>
+                                    <td>{{ item.month }} - {{ item.year }}</td>
+                                    <td>&#8369; {{ item.amount_due|floatformat:2|intcomma }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No unpaid transactions.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="text-end mt-2">
+                        <strong>Total Selected Amount: &#8369; <span id="totalAmount">0.00</span></strong>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Pay Selected</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Transaction Details Modal -->
+<div class="modal fade" id="transactionDetailsModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Transaction Details - <span id="modalTransId"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <tbody>
+                            <tr>
+                                <th class="bg-light" style="width: 40%;">Billing Transaction ID</th>
+                                <td id="detailTransId"></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Date</th>
+                                <td id="detailDate"></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Transaction Type</th>
+                                <td id="detailTransType"></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Bill Month (Month-Year)</th>
+                                <td id="detailBillMonth"></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Previous Reading</th>
+                                <td id="detailPrevReading"></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Current Reading</th>
+                                <td id="detailCurrReading"></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">CU.M Used</th>
+                                <td id="detailUsage"></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Bill Amount (₱)</th>
+                                <td id="detailBillAmount"></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Less Excess (₱)</th>
+                                <td id="detailExcess"></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Penalty (₱)</th>
+                                <td id="detailPenalty"></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Amount Due (₱)</th>
+                                <td id="detailAmountDue"></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Payment (₱)</th>
+                                <td id="detailPayment"></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Payment Transaction ID</th>
+                                <td id="detailPayTransId"></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Processed By</th>
+                                <td id="detailProcessedBy"></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Status</th>
+                                <td id="detailStatus"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const form = document.querySelector("#payment form");
+        const warningMessage = document.getElementById("warningMessage");
+
+        if (!form) {
+            console.error("❌ Form not found inside modal!");
+            return;
+        }
+
+        form.addEventListener("submit", function (e) {
+            const selectedCheckboxes = form.querySelectorAll("input[name='selected_trans']:checked");
+
+            if (selectedCheckboxes.length === 0) {
+                e.preventDefault();
+                warningMessage.classList.remove("d-none");
+            } else {
+                warningMessage.classList.add("d-none");
+                const selectedValues = Array.from(selectedCheckboxes).map(cb => cb.value);
+                console.log("🧾 JS Selected values before submission:", selectedValues);
+            }
+        });
+
+        // Optional: Hide warning when checkbox is changed
+        form.querySelectorAll("input[name='selected_trans']").forEach(cb => {
+            cb.addEventListener("change", () => {
+                if (form.querySelectorAll("input[name='selected_trans']:checked").length > 0) {
+                    warningMessage.classList.add("d-none");
+                }
+            });
+        });
+    });
+</script>
+
+<!-- Filter + Get Copy Button -->
+<div class="row w-100 m-auto pt-2">
+    {% include 'billingbuttons.html' %}
+    {% include 'billcopy.html' with unpaid=unpaid %}
+    <div class="col-lg-6 col-md-6 col-sm-12 pt-2">
+        <button onclick="getpdf()" class="btn button2 float-end">
+            <img src="{% static 'images/file_copy_FILL0_wght700_GRAD0_opsz48.svg' %}" style="width:15px;" />
+            Get a Copy
+        </button>
+
+        <form id="displayselection" method="GET" class="d-flex align-items-center float-end me-3">
+            <label for="showSelect" class="me-2 mb-0">Show</label>
+            <select id="showSelect" name="show" class="form-select" style="width: auto; min-width: 150px;"
+                onchange="this.form.submit()">
+                <option value="" {% if disp == "" %}selected{% endif %}>All</option>
+                <option value="Billing" {% if disp == "Billing" %}selected{% endif %}>Billing</option>
+                <option value="Additional Fee" {% if disp == "Additional Fee" %}selected{% endif %}>Additional Fees</option>
+            </select> 
+        </form>        
+    </div>
+</div>
+
+<!-- For searching -->
+<div class="col-lg-3 col-md-4 col-sm-12 pt-2 float-end">
+    <div class="input-group" style="max-width: 370px; transform:translate(12px, 5px)">
+        <span class="input-group-text" id="search-addon" style="padding: 0 8px;">
+            <img style="width: 23px;" src="{% static 'search_FILL1_wght700_GRAD200_opsz48.svg' %}" />
+        </span>
+        <input type="text" id="searchTransId" class="form-control" placeholder="Search Transaction ID..." 
+               style="min-width: 200px; flex: 1;">
+    </div>
+</div>
+
+<div id="ledger">
+    <h1 class="text-center mb-3">Account Ledger</h1>
+
+    <!-- Horizontal Scroll -->
+    <div class="table-responsive container-fluid p-0">
+        <!-- Vertical Scroll for more than 10 rows -->
+        <div class="col-12">
+            <div class="{% if table|length > 10 %} table-scroll-vertical {% endif %}">
+                <table class="table table-hover table-bordered table-sm table-striped">
+                    <thead class="wb_thead" style="position: sticky; top: 0; background-color: white; z-index: 2;">
+                        <tr>
+                            <th>Billing Transaction ID</th>
+                            <th>Date</th>
+                            <th>Transaction Type</th>
+                            <th>Bill Month (Month-Year)</th>
+                            <th>Current Reading</th>
+                            <th class="hide-column">Previous Reading</th>
+                            <th class="hide-column">CU.M Used</th>
+                            <th class="hide-column">Bill Amount (₱)</th>
+                            <th class="hide-column">Less Excess (₱)</th>
+                            <th class="hide-column">Penalty (₱)</th>
+                            <th>Amount Due (₱)</th>
+                            <th class="hide-column">Payment (₱)</th>
+                            <th class="hide-column">Payment Transaction ID</th>
+                            <th class="hide-column">Processed By</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="wb_tbody">
+                        {% for t in table reversed %}
+                        <tr class="{% if t.reading %}context-menu-target{% else %}no-right-click{% endif %}
+                                   {% if t.status == 'Paid' %}row-bill{% endif %}
+                                   {% if t.transType == 'Additional Fee' %}row-addfee{% endif %}
+                                   {% if t.transType == 'Reset Meter' %}row-reset{% endif %}"
+                            data-link="form-{{t.transid}}">
+                            <form id="form-{{t.transid}}" action="{% url 'add_issue' u.consumer_id t.year %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="reading-{{t.month}}" value="{{t.reading}}">
+                                <input type="hidden" name="prev-{{t.month}}" value="{{t.prev}}">
+                                <input type="hidden" name="type-{{t.month}}" value="Sudden Jump">
+                            </form>
+                            <td class="clickable-trans-id" title="Click for more details">{{t.transid}}</td>
+                            <td>{{t.date}}</td>
+                            <td>{{t.transType}}</td>
+                            <td>{{t.month|slice:":3"}}-{{t.year}}</td>
+                            <td>{{t.reading}}</td>
+                            <td class="hide-column">{{t.prev}}</td>
+                            <td class="hide-column">{{t.usage}}</td>
+                            <td class="hide-column" style="text-align: right;">{{t.bill|floatformat:2|intcomma}}</td>
+                            <td class="hide-column" style="text-align: right;">{{t.excess|default:0|floatformat:2|intcomma}}</td>
+                            <td class="hide-column" style="text-align: right;">{{t.penalty|default:0|floatformat:2|intcomma}}</td>
+                            <td>
+                                {% if t.status == "Unpaid" or t.status == "NotFullyPaid" %}
+                                    {{t.amount_due|default:0|floatformat:2|intcomma}}
+                                {% endif %}
+                            </td>
+                            <td class="hide-column" style="text-align: right;">
+                                {% if t.payment %}
+                                    {{ t.payment|floatformat:2|intcomma }}
+                                {% endif %}
+                            </td>
+                            <td class="hide-column">{{t.paytranid}}</td>
+                            <td class="hide-column">{{t.ppb}}</td>
+                            <td class="text-align left">{{ t.status }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    // Disable right-click for specified elements
+    const noRightClickElements = document.querySelectorAll('.no-right-click');
+    noRightClickElements.forEach(function (element) {
+        element.addEventListener('contextmenu', function (event) {
+            event.preventDefault();
+        });
+    });
+
+    // Submit form utility
+    function submitForm(id) {
+        document.getElementById(id).submit();
+    }
+
+    const table = document.getElementById("dtBasicExample2");
+    const contextMenu = document.getElementById('contextMenu');
+    const customLink = document.getElementById('customLink');
+    let highlightedRow = null;
+
+    // Context menu logic
+    document.querySelectorAll('.context-menu-target').forEach(function (target) {
+        target.addEventListener('contextmenu', function (e) {
+            table.classList.remove('table-hover');
+            if (highlightedRow) {
+                highlightedRow.classList.remove('highlight');
+            }
+            highlightedRow = target;
+            highlightedRow.classList.add('highlight');
+            e.preventDefault();
+            customLink.innerHTML = `<a class="text-danger fw-bold" onClick="submitForm('${target.dataset.link}')">Report as Issue</a>`;
+            contextMenu.style.display = 'block';
+            contextMenu.style.left = e.pageX + 'px';
+            contextMenu.style.top = e.pageY + 'px';
+        });
+    });
+
+    document.addEventListener('click', function () {
+        if (highlightedRow) {
+            highlightedRow.classList.remove('highlight');
+            highlightedRow = null;
+            table.classList.add('table-hover');
+        }
+        contextMenu.style.display = 'none';
+    });
+
+    // PDF Generation
+    function getpdf() {
+        const doc = new jsPDF('landscape', 'pt', 'legal');
+        const margins = { top: 150, bottom: 60, left: 40, right: 40 };
+        let y = 20;
+
+        const numberformat = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'PHP',
+            currencyDisplay: 'code'
+        });
+
+        doc.setFont("Courier", "bold");
+        doc.setFontSize(20);
+        doc.text(420, y += 20, "GINATILAN WATER");
+
+        y = 60;
+        doc.setFontSize(15);
+        doc.setFont("Courier", "normal");
+        doc.text(40, y += 10, "Account ID:");
+        doc.text(300, y, "{{ u.consumer_id }}");
+        doc.text(40, y += 15, "Name:");
+        doc.text(300, y, "{{ u.firstname }} {{ u.middlename }} {{ u.lastname }}");
+        doc.text(40, y += 15, "Meter Number:");
+        doc.text(300, y, "{{ u.meternumber }}");
+        doc.text(40, y += 15, "Balance:");
+        doc.text(300, y, "PHP {{ total_balance|floatformat:2|intcomma }}");
+
+        y += 70;
+        doc.setFontSize(20);
+        doc.setFont("Courier", "bold");
+        doc.text(420, y += 30, "ACCOUNT LEDGER");
+
+        // Construct table data
+        const table = [
+            {% for t in table reversed %}
+            ["{{ t.transid }}", "{{ t.transType }}", "{{ t.month|slice:":3" }}-{{ t.year }}", "{{ t.prev }}", "{{ t.reading }}", "{{ t.usage }}", "{{ t.bill|floatformat:2 }}", "{{ t.payment|floatformat:2 }}", "{{ t.ppb }}", "{{ t.status }}"],
+            {% endfor %}
+        ];
+
+        y += 5;
+        doc.setFontSize(11);
+        doc.autoTable({
+            head: [['Transaction ID', 'Type', 'Month-Year', 'Previous', 'Current Reading', 'Cubic Meter Used', 'Amount', 'Payment', 'Processed By', 'Status']],
+            body: table,
+            startY: y + 30,
+            theme: 'striped',
+            styles: { font: "Courier" },
+            didParseCell: function (data) {
+                if (data.section === 'body') {
+                    const row = data.row.raw;
+                    const transType = row[1];
+                    const status = row[9];  // status column
+
+                    if (transType === "Additional Fee") {
+                        data.cell.styles.fillColor = [135, 206, 235];  // Sky Blue
+                    } else if (transType === "Billing" && status === "Paid") {
+                        data.cell.styles.fillColor = [240, 255, 240];  // Light Green
+                    } else {
+                        data.cell.styles.fillColor = [255, 255, 255];  // Default white
+                    }
+                }
+            }
+        });
+
+        doc.save(`{{ u.firstname }}_{{ u.lastname }}_ledger.pdf`);
+    }
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkboxes = document.querySelectorAll('.trans-checkbox');
+        const totalDisplay = document.getElementById('totalAmount');
+
+        function updateTotal() {
+            let total = 0;
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    total += parseFloat(cb.dataset.amount);
+                }
+            });
+            totalDisplay.textContent = Number(total.toFixed(2)).toLocaleString(undefined, { minimumFractionDigits: 2 });
+        }
+
+        checkboxes.forEach(cb => cb.addEventListener('change', updateTotal));
+    });
+</script>
+
+<!-- For searching  -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchBox = document.getElementById('searchTransId');
+    const ledgerTable = document.querySelector('#ledger table tbody');
+
+    searchBox.addEventListener('input', function() {
+        const filter = searchBox.value.toLowerCase();
+
+        ledgerTable.querySelectorAll('tr').forEach(row => {
+            const transId = row.cells[0].textContent.toLowerCase();
+            if (transId.includes(filter)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+
+<!-- Hide columns CSS -->
+<style>
+    .hide-column {
+        display: none;
+    }
+</style>
+
+<!-- Transaction Details Modal Handler -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add click event to all transaction ID cells with the clickable class
+    const transIdCells = document.querySelectorAll('.clickable-trans-id');
+    
+    transIdCells.forEach(cell => {
+        cell.addEventListener('click', function(e) {
+            e.stopPropagation(); // Prevent any parent click events
+            
+            const row = this.closest('tr');
+            const cells = row.querySelectorAll('td');
+            
+            // Populate modal with row data (accounting for hidden columns)
+            document.getElementById('modalTransId').textContent = cells[0].textContent;
+            document.getElementById('detailTransId').textContent = cells[0].textContent;
+            document.getElementById('detailDate').textContent = cells[1].textContent;
+            document.getElementById('detailTransType').textContent = cells[2].textContent;
+            document.getElementById('detailBillMonth').textContent = cells[3].textContent;
+            document.getElementById('detailCurrReading').textContent = cells[4].textContent;
+            document.getElementById('detailPrevReading').textContent = cells[5].textContent;
+            document.getElementById('detailUsage').textContent = cells[6].textContent;
+            document.getElementById('detailBillAmount').textContent = cells[7].textContent;
+            document.getElementById('detailExcess').textContent = cells[8].textContent;
+            document.getElementById('detailPenalty').textContent = cells[9].textContent;
+            document.getElementById('detailAmountDue').textContent = cells[10].textContent || 'N/A';
+            document.getElementById('detailPayment').textContent = cells[11].textContent || 'N/A';
+            document.getElementById('detailPayTransId').textContent = cells[12].textContent || 'N/A';
+            document.getElementById('detailProcessedBy').textContent = cells[13].textContent || 'N/A';
+            document.getElementById('detailStatus').textContent = cells[14].textContent;
+            
+            // Show the modal
+            const modal = new bootstrap.Modal(document.getElementById('transactionDetailsModal'));
+            modal.show();
+        });
+    });
+});
+</script>
+
+{% endblock ledger %}
