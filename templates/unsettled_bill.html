@@ -74,14 +74,14 @@ Unsettled Bills
                         </thead>
                         <tbody class="wb_tbody">
                             {% if table %}
-                            {% for ub in table %}
+                            {% for row in table %}
                             <tr class='clickable-row' onclick="click" style="cursor: pointer;"
-                                data-href="{% url 'view_unsettled_bills' ub.u.consumer_id ub.y %}">
-                                <td class="text-center">{{ub.u.consumer_id}}</td> 
-                                <td>{{ub.u.lastname}}, {{ub.u.firstname}} {{ub.u.middlename}}</td>
-                                <td class="text-center">{{ub.u.meternumber}}</td>
-                                <td class="text-center">{{ub.u.installation_address}}</td>
-                                <td style="text-align: right;"> {{ub.u.current_bal|floatformat:2|intcomma}}</td> 
+                                data-href="{% url 'view_unsettled_bills' row.u.consumer_id row.y %}">
+                                <td class="text-center">{{row.u.consumer_id}}</td> 
+                                <td>{{row.u.lastname}}, {{row.u.firstname}} {{row.u.middlename}}</td>
+                                <td class="text-center">{{row.u.meternumber}}</td>
+                                <td class="text-center">{{row.u.installation_address}}</td>
+                                <td style="text-align: right;"> {{row.u.current_bal|floatformat:2|intcomma}}</td> 
                             </tr>
                             {% endfor %}
                             {% else %}
