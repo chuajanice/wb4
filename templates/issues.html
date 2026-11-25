@@ -59,7 +59,7 @@ Issues
             <tbody class="tbody">
                 {% if issue_list %}
                     {% for i in issue_list %}
-                        {% if user.is_supervisor or i.issued_by == user.username and last_message %}
+                        {% if user.is_supervisor or i.issued_by == user.username %}
                             <tr class="{% if not i.is_seen or not last_message.is_read %}table-light{% endif %} clickable-row" data-href="{% url 'issue_details' i.issueid %}" {% if not i.is_seen %}style="font-weight: 600;"{% else %}style="color: #202124;"{% endif %}>
                                 <td class="ps-3">{{ i.issued_by }}</td>
                                 <td>{{ i.status }}</td>
@@ -73,7 +73,7 @@ Issues
                     {% endfor %}
                 {% else %}
                     <tr>
-                        <td colspan="5" class="table-light" style="text-align: center;">No issues found</td>
+                        <td colspan="7" class="table-light" style="text-align: center;">No issues found</td>
                     </tr>
                 {% endif %}
                 <style>
