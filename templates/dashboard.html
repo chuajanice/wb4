@@ -96,6 +96,7 @@
                                 <span class="sidenav_text">Reports</span>
                             </a>
                         </li>
+                        <li class="modal_side_nav_li">
                             <a class="modal_side_nav_li_text" href="{% url 'unsettled_bills' %}"
                                 style="color: white; text-decoration: none">
                                 <i class="fa fa-line-chart fa-2x"></i>
@@ -407,25 +408,30 @@
         
     </div>
 
+    <script src="{% static 'jquery/jquery.js' %}"></script>
+    <script src="{% static 'bootstrap.min.js' %}"></script>
+    <script src="{% static 'popper.min.js' %}"></script>
+
     <script>
         // this is for hiposon ang sidebar
-        // hipos = {% if hipos %}true{% else %}false{% endif %}
-        // pagelinks = document.getElementsByClassName("page-links");
-        // function hiposon(){
-        //     if(hipos){
-        //         document.getElementById("first_toggle").style.display = "none";
-        //         document.getElementById("second_toggle").style.display = "none";
-        //         document.getElementById("third_toggle").style.display = "initial";
-        //         document.getElementById("mobile_header_nav").style.display = "none";
-        //         document.getElementById("side_nav").classList.remove("sidebar");
-        //         document.getElementById("side_nav").classList.add("remove_sidebar2");
-        //         document.getElementById("main_content").classList.remove("main_content");
-        //         document.getElementById("main_content").classList.add("remove_main_content");
-        //         for(i=0;i<pagelinks.length;i++){
-        //             pagelinks[i].href += "&sidebar=False"
-        //         }
-        //     }
-        // }
+        var hipos = {% if hipos %}true{% else %}false{% endif %};
+        var pagelinks = document.getElementsByClassName("page-links");
+        function hiposon(){
+            if(!hipos){
+                return;
+            }
+            document.getElementById("first_toggle").style.display = "none";
+            document.getElementById("second_toggle").style.display = "none";
+            document.getElementById("third_toggle").style.display = "initial";
+            document.getElementById("mobile_header_nav").style.display = "none";
+            document.getElementById("side_nav").classList.remove("sidebar");
+            document.getElementById("side_nav").classList.add("remove_sidebar");
+            document.getElementById("main_content").classList.remove("main_content");
+            document.getElementById("main_content").classList.add("remove_main_content");
+            for(var i=0;i<pagelinks.length;i++){
+                pagelinks[i].href += "&sidebar=False"
+            }
+        }
         function media_query_720(screen_size) {
             if (screen_size.matches) {
                 document.getElementById("first_toggle").style.display = "none";
@@ -507,18 +513,16 @@
         });
     </script>
 
-    <script src="{% static 'jquery/jquery.js' %}"></script>
-    <script src="{% static 'bootstrap.min.js' %}"></script>
-    <script src="{% static 'popper.min.js' %}"></script>
-
     <script>
         var login = document.getElementById('login');
-        setTimeout(function closeModal() {
-            login.classList.add("op-0")
-        }, 3000)
-        setTimeout(function dispnone() {
-            login.style.display = "none"
-        }, 4000)
+        if (login) {
+            setTimeout(function closeModal() {
+                login.classList.add("op-0")
+            }, 3000)
+            setTimeout(function dispnone() {
+                login.style.display = "none"
+            }, 4000)
+        }
     </script>
 
     {% block script %}
