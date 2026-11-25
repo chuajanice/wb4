@@ -70,59 +70,71 @@ Registration Form
                     <div class="col-lg-4 col-md-6 col-sm-12 mb-2">
                         <label for="">First Name<span class="text-danger">*</span></label>
                         {{form.first_name}}
-                        {% for error in form.first_name.errors %}
+                        {% if form.first_name.errors %}
                         <div id="id_first_nameFeedback" class="invalid-feedback">
+                            {% for error in form.first_name.errors %}
                             <small>{{ error|escape }}</small>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
+                        {% endif %}
                     </div>
 
                     <div class="col-lg-4 col-md-6 col-sm-12 mb-2">
                         <label for="">Middle Name</label>
                         {{form.mid_name}}
-                        {% for error in form.mid_name.errors %}
+                        {% if form.mid_name.errors %}
                         <div id="id_mid_nameFeedback" class="invalid-feedback">
+                            {% for error in form.mid_name.errors %}
                             <small>{{ error|escape }}</small>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
+                        {% endif %}
                     </div>
 
                     <div class="col-lg-4 col-md-6 col-sm-12 mb-2">
                         <label for="">Last Name<span class="text-danger">*</span></label>
                         {{form.last_name}}
-                        {% for error in form.last_name.errors %}
+                        {% if form.last_name.errors %}
                         <div id="id_last_nameFeedback" class="invalid-feedback">
+                            {% for error in form.last_name.errors %}
                             <small>{{ error|escape }}</small>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
+                        {% endif %}
                     </div>
 
                     <div class="col-lg-4 col-md-6 col-sm-12 mb-2">
                         <label for="">Mobile Number<span class="text-danger">*</span></label>
                         {{form.mobilenum}}
-                        {% for error in form.mobilenum.errors %}
+                        {% if form.mobilenum.errors %}
                         <div id="id_mobilenumFeedback" class="invalid-feedback">
+                            {% for error in form.mobilenum.errors %}
                             <small>{{ error|escape }}</small>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
+                        {% endif %}
                     </div>
                     <div class="col-lg-4 col-md-6 col-sm-12 mb-2">
                         <label for="">Email<span class="text-danger">*</span></label>
                         {{form.email}}
-                        {% for error in form.email.errors %} 
+                        {% if form.email.errors %}
                         <div id="id_emailFeedback" class="invalid-feedback">
+                            {% for error in form.email.errors %}
                             <small>{{ error|escape }}</small>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
+                        {% endif %}
                     </div>
                     <div class="col-lg-4 col-md-6 col-sm-12 mb-2">
                         <label for="">Username<span class="text-danger">*</span></label>
                         {{form.username}}
-                        {% for error in form.username.errors %}
+                        {% if form.username.errors %}
                         <div id="id_usernameFeedback" class="invalid-feedback">
+                            {% for error in form.username.errors %}
                             <small>{{ error|escape }}</small>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
+                        {% endif %}
                     </div>
                 </div>
 
@@ -136,11 +148,13 @@ Registration Form
                                     src="{% static '/images/eye-off.svg' %}">
                             </div>
                         </div>
-                        {% for error in form.password2.errors %}
+                        {% if form.password1.errors %}
                         <div id="id_password1Feedback" class="invalid-feedback">
+                            {% for error in form.password1.errors %}
                             <small>{{ error|escape }}</small>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
+                        {% endif %}
                     </div>
                     <div class="col-lg-6 col-md-6 col-sm-12 mb-2">
                         <label for="">Confirm Password<span class="text-danger">*</span></label>
@@ -151,33 +165,35 @@ Registration Form
                                     src="{% static '/images/eye-off.svg' %}">
                             </div>
                         </div>
-                        {% for error in form.password2.errors %}
+                        {% if form.password2.errors %}
                         <div class="invalid-feedback">
+                            {% for error in form.password2.errors %}
                             <small>{{ error|escape }}</small>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
+                        {% endif %}
                     </div>
                 </div>
                 <div class="row form-group m-auto w-100">
                     <div class="col-lg-6 col-md-6 col-sm-12 mb-2">
                         <label>Type of User</label>
-                        <div class="form-check" type="checkbox">
+                        <div class="form-check">
                             {{form.is_admin}}
                             <label class="form-check-label" for="id_is_admin">Admin</label>
                         </div>
-                        <div class="form-check" type="checkbox">
+                        <div class="form-check">
                             {{form.is_teller}}
                             <label class="form-check-label" for="id_is_teller">Teller</label>
                         </div>
-                        <div class="form-check" type="checkbox">
+                        <div class="form-check">
                             {{form.is_supervisor}}
                             <label class="form-check-label" for="id_is_supervisor">Supervisor</label>
                         </div>
-                        <div class="form-check" type="checkbox">
+                        <div class="form-check">
                             {{form.is_manager}}
                             <label class="form-check-label" for="id_is_manager">Manager</label>
                         </div>
-                        <div class="form-check" type="checkbox">
+                        <div class="form-check">
                             {{form.is_reader}}
                             <label class="form-check-label" for="id_is_reader">Meter Reader</label>
                         </div>
