@@ -104,9 +104,6 @@
                     </div>
                 </div>
 
-                <!-- Hidden input for concatenated fee names -->
-                <input type="hidden" name="additionalfee_names" id="additionalfee_names" required>
-
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="submit" id="submit-btn" class="btn btn-primary">Submit</button>
@@ -153,6 +150,13 @@
         installmentInput.addEventListener('input', () => { recalcRow(row); });
         const removeBtn = row.querySelector('.remove-row');
         removeBtn.addEventListener('click', () => {
+            // Keep at least one row so the form can never be submitted empty
+            if (document.querySelectorAll('#fees-table tbody tr').length <= 1) {
+                row.querySelectorAll('input').forEach(input => { input.value = ''; });
+                recalcRow(row);
+                updateTotal();
+                return;
+            }
             row.remove();
             updateTotal();
         });
@@ -199,7 +203,6 @@
         // Reset totals
         document.getElementById('total-fees').innerText = "0.00";
         document.getElementById('totalAmount').value = "0.00";
-        document.getElementById('additionalfee_names').value = "";
 
         // Reattach events to the single row
         document.querySelectorAll('#fees-table tbody tr').forEach(attachEvents);
