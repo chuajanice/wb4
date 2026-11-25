@@ -467,7 +467,7 @@
             document.getElementById("side_nav").classList.add("remove_sidebar");
             document.getElementById("main_content").classList.remove("main_content");
             document.getElementById("main_content").classList.add("remove_main_content");
-            for(i=0;i<pagelinks.length;i++){
+            for(var i=0;i<pagelinks.length;i++){
                 pagelinks[i].href += "&sidebar=False"
             }
         }
@@ -478,7 +478,7 @@
             document.getElementById("side_nav").classList.remove("remove_sidebar");
             document.getElementById("main_content").classList.add("main_content");
             document.getElementById("main_content").classList.remove("remove_main_content");
-            for(i=0;i<pagelinks.length;i++){
+            for(var i=0;i<pagelinks.length;i++){
                 pagelinks[i].href = pagelinks[i].href.replace("&sidebar=False",'')
             }
         }
