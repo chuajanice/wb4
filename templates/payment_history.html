@@ -376,14 +376,14 @@ Payment History
 
     <!-- Payment form/Modal -->
 {% for i in alltrans %}
-<div class="modal fade" id="edit-{{i.transactionid}}" tabindex="-1" role="dialog" aria-labelledby="payment"
+<div class="modal fade" id="edit-{{i.transactionid}}" tabindex="-1" role="dialog" aria-labelledby="editPaymentTitle-{{i.transactionid}}"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <form action="{% url 'editpayment' i.transactionid %}" method="POST">
                 {% csrf_token %}
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalCenterTitle">Payment</h5>
+                    <h5 class="modal-title" id="editPaymentTitle-{{i.transactionid}}">Payment</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
 
@@ -427,7 +427,7 @@ Payment History
 
 {% for t in alltrans%}
     <!-- This section is for Unpaid Action finished 03/22/2025 by zel-->
-<div class="modal fade" id="pay-{{t.transactionid}}" tabindex="-1" role="dialog" aria-labelledby="payment"
+<div class="modal fade" id="pay-{{t.transactionid}}" tabindex="-1" role="dialog" aria-labelledby="modal-title-{{t.transactionid}}"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -448,14 +448,14 @@ Payment History
 
 
                             <label for="transaction_id">Transaction ID:</label>
-                            <span id="modal-transaction-id" style="margin-left: 10px;"></span><br>
+                            <span class="modal-transaction-id" style="margin-left: 10px;"></span><br>
 
 
 
 
                                
                             <label for="id_or_num">Amount Paid:</label>
-                            <span id="modal-amount" style="margin-left: 10px;"></span><br>
+                            <span class="modal-amount" style="margin-left: 10px;"></span><br>
 
 
 
@@ -465,13 +465,13 @@ Payment History
 
 
                             <label for="id_or_num">OR Number:</label>
-                            <span id="modal-or-number" style="margin-left: 10px;"></span><br>
+                            <span class="modal-or-number" style="margin-left: 10px;"></span><br>
 
 
 
 
                             <label for="payment_date">Date Paid:</label>
-                            <span id="modal-payment-date" style="margin-left: 10px;"></span><br>
+                            <span class="modal-payment-date" style="margin-left: 10px;"></span><br>
 
 
 
@@ -489,8 +489,8 @@ Payment History
 
 
 
-                            <label for="id_remarks">Remarks:</label>
-                            <input type="text" name="remarks" id="id_remarks" required class="input form-control" placeholder="Enter Remarks"><br>
+                            <label for="id_remarks-{{ t.transactionid }}">Remarks:</label>
+                            <input type="text" name="remarks" id="id_remarks-{{ t.transactionid }}" required class="input form-control" placeholder="Enter Remarks"><br>
 
 
 
@@ -543,10 +543,10 @@ Payment History
             var date = button.data('date');
    
             var modal = $(this);
-            modal.find('#modal-transaction-id').text(transactionId);
-            modal.find('#modal-amount').text(receivedAmount);
-            modal.find('#modal-or-number').text(orNumber);
-            modal.find('#modal-payment-date').text(date);
+            modal.find('.modal-transaction-id').text(transactionId);
+            modal.find('.modal-amount').text(receivedAmount);
+            modal.find('.modal-or-number').text(orNumber);
+            modal.find('.modal-payment-date').text(date);
    
             // Update the form action dynamically to target the correct transaction ID
             modal.find('form').attr('action', `/mark_unpaid/${transactionId}/`);
