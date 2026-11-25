@@ -72,74 +72,74 @@ Consumer Creation
         </div>
         <div class="row form-group w-100 m-auto">
             <div class="col-lg-4 col-md-12 col-sm-12 mb-2">
-                <label for=""style="font-size: 20px;">First Name<span class="text-danger">*</span></label>
+                <label for="id_firstname" style="font-size: 20px;">First Name<span class="text-danger">*</span></label>
                 {{form.firstname}}
             </div>
             <div class="col-lg-4 col-md-12 col-sm-12 mb-2">
-                <label for=""style="font-size: 20px;">Middle Name</label>
+                <label for="id_middlename" style="font-size: 20px;">Middle Name</label>
             {{form.middlename}}
             </div>
             <div class="col-lg-4 col-md-12 col-sm-12 mb-2">
-                <label for=""style="font-size: 20px;">Last Name<span class="text-danger">*</span></label>
+                <label for="id_lastname" style="font-size: 20px;">Last Name<span class="text-danger">*</span></label>
                 {{form.lastname}}
             </div>
         </div>
         <div class="row form-group w-100 m-auto">
             <div class="col-lg-4 col-md-12 col-sm-12 mb-2">
-                <label for=""style="font-size: 20px;">Home Address<span class="text-danger">*</span></label>
+                <label for="id_homeaddress" style="font-size: 20px;">Home Address<span class="text-danger">*</span></label>
                 {{form.homeaddress}}
             </div>
             <div class="col-lg-4 col-md-12 col-sm-12 mb-2">
-                <label for=""style="font-size: 20px;">Sitio</label>
+                <label for="id_sitio" style="font-size: 20px;">Sitio</label>
                 {{form.sitio}}
             </div>
             <div class="col-lg-4 col-md-12 col-sm-12 mb-2">
-                <label for=""style="font-size: 20px;">Email</label>
+                <label for="id_email" style="font-size: 20px;">Email</label>
             {{form.email}}
             </div>
         </div>
         <div class="row form-group w-100 m-auto">
             <div class="col-lg-4 col-md-12 col-sm-12 mb-2">
-                <label for=""style="font-size: 20px;">Meter Number<span class="text-danger">*</span></label>
+                <label for="id_meternumber" style="font-size: 20px;">Meter Number<span class="text-danger">*</span></label>
                 {{form.meternumber}}
             </div>
             <div class="col-lg-4 col-md-12 col-sm-12 mb-2">
-                <label for=""style="font-size: 20px;">Initial Meter Reading<span class="text-danger">*</span></label>
+                <label for="id_initialmeterreading" style="font-size: 20px;">Initial Meter Reading<span class="text-danger">*</span></label>
                 {{form.initialmeterreading}}
             </div>
             <div class="col-lg-4 col-md-12 col-sm-12 mb-2">
-                <label for="id"style="font-size: 20px;">Rate I.D.<span class="text-danger">*</span></label>
+                <label for="id_contypeid" style="font-size: 20px;">Rate I.D.<span class="text-danger">*</span></label>
                 {{form.contypeid}}
             </div>
         </div>
         <div class="row form-group w-100 m-auto">
             <div class="col-lg-4 col-md-12 col-sm-12 mb-2">
-                <label for=""style="font-size: 20px;">Installation Address<span class="text-danger">*</span></label>
+                <label for="id_installation_address" style="font-size: 20px;">Installation Address<span class="text-danger">*</span></label>
             {{form.installation_address}}
             </div>
             <div class="col-lg-4 col-md-12 col-sm-12 mb-2">
-                <label for="start"style="font-size: 20px;">Birthdate<span class="text-danger">*</span></label>
+                <label for="id_birthdate" style="font-size: 20px;">Birthdate<span class="text-danger">*</span></label>
                 {{form.birthdate}}
             </div>
             <div class="col-lg-4 col-md-12 col-sm-12 mb-2">
-                <label for=""style="font-size: 20px;">Sex<span class="text-danger">*</span></label>
+                <label for="id_sex" style="font-size: 20px;">Sex<span class="text-danger">*</span></label>
                 {{form.sex}}
             </div>
         </div>
         <div class="row form-group w-100 m-auto">
             <div class="col-lg-4 col-md-12 col-sm-12 mb-2">
-                <label for=""style="font-size: 20px;">Mobile Number</label>
+                <label for="id_mobilenum" style="font-size: 20px;">Mobile Number</label>
                 {{form.mobilenum}}
             </div>
             <div class="col-lg-4 col-md-12 col-sm-12 mb-2">
-                <label for="" class=""style="font-size: 20px;">Penalty Code</label>
+                <label for="id_penaltycode" style="font-size: 20px;">Penalty Code</label>
                 {{form.penaltycode}}
             </div>
             <div class="col-lg-4 col-md-12 col-sm-12 mb-2">
             </div>
         </div>
         <div class="row m-auto" style="display: block; text-align: center;">
-            <a href="{% url 'consumer_list' %}" class="btn button2" style="width: 150px; white-space: nowrap; padding-right=50px;">
+            <a href="{% url 'consumer_list' %}" class="btn button2" style="width: 150px; white-space: nowrap; padding-right: 50px;">
                 <img style="width: 23px;" src="{% static '/images/cancel_FILL1_wght700_GRAD0_opsz48.svg' %}" />
                 <span style="padding: 10px; font-family: Arial;">Cancel</span>
             </a>
@@ -151,7 +151,7 @@ Consumer Creation
     </form>
 </div>
 <script>
-    function onlyzNumberKey(evt) {
+    function onlyNumberKey(evt) {
           
         // Only ASCII character in that range allowed
         var ASCIICode = (evt.which) ? evt.which : evt.keyCode

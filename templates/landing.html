@@ -146,18 +146,28 @@
        
          .login-card {
         width: 100%;
-        max-width: 520px;   /* ⬅️ increased from 460px */
-        background: linear-gradient(135deg, #0093B7, #006c85);
+        max-width: 520px;
+        background: #007c91;
         color: #fff;
-        border-radius: 24px; /* ⬅️ slightly more rounded */
-        padding: 60px 50px;  /* ⬅️ more padding inside */
-        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
         text-align: center;
         animation: fadeInUp 0.8s ease;
-        height: 800px;          /* ⬅️ fixed height */
-        display: flex;          /* ⬅️ for vertical alignment */
+        height: 525px;
+        display: flex;
         flex-direction: column;
-        justify-content: center; /* center content vertically */
+        justify-content: center;
+    }
+
+    /* Sections start hidden; Home is the default view. showSection() overrides
+       with inline display, so the page still works without JavaScript. */
+    .page-section {
+        display: none;
+    }
+
+    #Home {
+        display: block;
     }
 
 
@@ -414,19 +424,6 @@
 
         <!-- ✅ Styles -->
         <style>
-        .login-card {
-            background: #007c91;
-            height: 525px;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-            text-align: center;
-            color: white;
-        }
-
-
-
-
         .form-control {
             border-radius: 10px;
             padding: 12px;
@@ -489,7 +486,7 @@
 
 
     <!-- ABOUT -->
-    <section class="page-section" id="About"style="background: linear-gradient(135deg, #fdfdfdff, #0093b7);">
+    <section class="page-section" id="About" style="background: linear-gradient(135deg, #fdfdfdff, #0093b7);">
         <div class="row w-100 m-auto align-items-center" style="min-height: 692px;">
             <div class="screen_size_md_none col-lg-6 text-end">
                 <img class="img-fluid" src="{% static 'img/about.svg.svg' %}" style="max-height: 350px;">
@@ -519,7 +516,7 @@
 
 
     <!-- SERVICES -->
-    <section class="page-section" id="Services"style="background: linear-gradient(135deg, #fdfdfdff, #0093b7);">
+    <section class="page-section" id="Services" style="background: linear-gradient(135deg, #fdfdfdff, #0093b7);">
         <div class="row w-100 m-auto align-items-center" style="min-height: 692px;">
             <div class="col-lg-6 col-md-12 col-sm-12 col-12 text-center">
                 <h2 style="color: #026f8aff; font-weight: 800;font-size: 50px">SERVICES</h2>
@@ -546,7 +543,7 @@
 
 
     <!-- CONTACTS -->
-    <section class="page-section" id="Contacts"style="background: linear-gradient(135deg, #fdfdfdff, #0093b7);">
+    <section class="page-section" id="Contacts" style="background: linear-gradient(135deg, #fdfdfdff, #0093b7);">
         <div class="row w-100 m-auto align-items-center" style="min-height: 692px;">
             <div class="col-lg-6 col-md-12 text-center" style="padding: 50px;">
                 <h2 style="color: #026f8aff; font-weight: 800; font-size: 50px;">CONTACT US</h2>
