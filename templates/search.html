@@ -15,8 +15,8 @@
                 </select> entries
             </label>
             <input type="hidden" name="search" id="fsearch_id" value="{{search}}">
-            <input type="hidden" name="fyear" id="fp" value="{{year}}">
-            <input type="hidden" name="fmonth" id="fp" value="{{monthval}}">
+            <input type="hidden" name="fyear" value="{{year}}">
+            <input type="hidden" name="fmonth" value="{{monthval}}">
         </form>
     </div>
     <div class="col-sm-12 col-md-4 col-lg-4 text-center">
@@ -31,46 +31,34 @@
     </div>
     <div class="col-sm-12 col-md-4 col-lg-4">
         <div id="table_filter" style="padding: 10px; float: right;" class="dataTables_filter">
-            <label>
-                <form class="input-group" action="" id="form" method="GET" role="form">
-                    <div class="input-group-text">
-                        <img style="width: 23px;" src="{% static 'search_FILL1_wght700_GRAD200_opsz48.svg' %}" />
-                    </div>
-                    <input  type="search" name="search" style="z-index:0;" id="myInput" oninput="check()" class="form-control form-control-sm rounded-end" placeholder="Search..." value="{{ search}}">
-                    <input type="hidden" name="p" id="fp" value="{{paginate_by}}">
-                    <input type="hidden" name="fyear" id="fp" value="{{year}}">
-                    <input type="hidden" name="fmonth" id="fp" value="{{monthval}}">
-                </form>
-            
-                <script>
-                    fsearch = document.getElementById('fsearch_id');
-                    fp = document.getElementById('fp');
-                    yearselection = document.getElementById('yearselection');
-                    selector = document.getElementById('selector');
-                    var newURL = window.location.href.split("&search")
-                    let myInput = document.getElementById('myInput');
-                    form = document.getElementById('form')
-                    function check() {
-                        if (myInput.value == ''){
-                            form.submit()
+            <form class="input-group" action="" id="form" method="GET" role="search">
+                <div class="input-group-text">
+                    <img style="width: 23px;" src="{% static 'search_FILL1_wght700_GRAD200_opsz48.svg' %}" />
+                </div>
+                <input type="search" name="search" style="z-index:0;" id="myInput" class="form-control form-control-sm rounded-end" placeholder="Search..." aria-label="Search" value="{{ search }}">
+                <input type="hidden" name="p" value="{{paginate_by}}">
+                <input type="hidden" name="fyear" value="{{year}}">
+                <input type="hidden" name="fmonth" value="{{monthval}}">
+            </form>
+
+            <script>
+                (function () {
+                    var yearselection = document.getElementById('yearselection');
+                    var selector = document.getElementById('selector');
+                    if (!yearselection || !selector) {
+                        return;
+                    }
+                    var newURL = window.location.href.split("&search");
+                    window.change = function () {
+                        if (newURL.length <= 1) {
+                            yearselection.action = newURL[0] + "?p=" + selector.value;
+                        } else {
+                            yearselection.action = newURL[0] + "&p=" + selector.value;
                         }
-                    }
-                    function change(){
-                        if(newURL.length<=1){
-                            yearselection.action = newURL[0] + "?p=" + selector.value
-                        }else{
-                            yearselection.action = newURL[0] + "&p=" + selector.value
-                        }
-                        yearselection.submit()
-                    }
-                    window.onload = function () {
-                        var input = document.getElementById("myInput");
-                        const end = input.value.length;
-                        input.setSelectionRange(end, end);
-                        input.focus();
-                    }
-                </script>
-            </label>
+                        yearselection.submit();
+                    };
+                })();
+            </script>
         </div>
     </div>
 </div>
