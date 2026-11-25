@@ -6,7 +6,6 @@ Payment History
 {% load humanize %}
 {% block payment_history %}
 <script src="{% static 'jspdf.min.js'%}"> </script>
-<script src="{% static 'jquery.min.js'%}"> </script>
 <script src="{% static 'html2pdf.bundle.min.js'%}"> </script>
 <script src="{% static 'jspdf.plugin.autotable.js'%}"> </script>
 
@@ -217,7 +216,6 @@ Payment History
 
 
  <!-- script added for unpaid button -Enjambre 3/21/2025-->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
 
@@ -314,7 +312,7 @@ Payment History
         <h1 class="mb-3 text-center">Payment History</h1>
         <div class="container-fluid p-0">
             <div class="table-responsive">
-                <table id="dtBasicExample2" class="table table-hover table-bordered table-sm" cellspacing="0"
+                <table id="paymentHistoryTable" class="table table-hover table-bordered table-sm" cellspacing="0"
                     width="100%">
                     <thead class="wb_thead">
                         <tr>
@@ -344,8 +342,8 @@ Payment History
                                 {% if t.total_amount_paid %}
                                     &#8369; {{ t.total_amount_paid }}
                                 {% else %}
-                                    <button type="button" class="badge bg-success" data-bs-toggle="modal"
-                                        data-bs-target="#pay-{{ t.monthval }}"
+                                    <button type="button" class="badge bg-success"
+                                        onclick="event.stopPropagation(); bootstrap.Modal.getOrCreateInstance(document.getElementById('pay-{{ t.transactionid }}')).show(this);"
                                         data-transaction-id="{{ t.transactionid }}"
                                         data-received-amount="{{ t.receivedamt|floatformat:2|intcomma }}"
                                         data-or-number="{{ t.or_number }}"
@@ -429,7 +427,7 @@ Payment History
 
 {% for t in alltrans%}
     <!-- This section is for Unpaid Action finished 03/22/2025 by zel-->
-<div class="modal fade" id="pay-{{t.monthval}}" tabindex="-1" role="dialog" aria-labelledby="payment"
+<div class="modal fade" id="pay-{{t.transactionid}}" tabindex="-1" role="dialog" aria-labelledby="payment"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -536,7 +534,7 @@ Payment History
 
 <!--  added for unpaid action-Estenor 3/21/2025-->
 <script>
-    $(document).ready(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         $(document).on('show.bs.modal', '[id^=pay-]', function (event) {
             var button = $(event.relatedTarget);
             var transactionId = button.data('transaction-id'); // Ensure the correct transaction ID is used
