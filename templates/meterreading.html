@@ -21,16 +21,6 @@ Meter Reading
 		transition: 0.3s all ease-in-out;
 
 	}
-
-	.hide {
-		opacity: 0;
-		transition: 0.3s all ease-in-out;
-	}
-
-	.showOnHover:hover .hide {
-		opacity: 1;
-		transition: 0.3s all ease-in-out;
-	}
 	
 
 	.button2 {
@@ -403,42 +393,3 @@ Meter Reading
 </script>
 
 {% endblock meterreading %}
-
-
-
-
-
-
-<table id="table" class="table table-bordered table-hover table-striped table-sm " width="100%">
-	<thead class="wb_thead">
-		<tr>
-			<th scope="col" style="background-color: #0093b7;">Barangay</th>
-			<th scope="col" style="background-color: #0093b7">Total Usage(㎥)</th>
-			<th scope="col" style="background-color: #0093b7">Total Receivables</th>
-			<th scope="col" style="background-color: #0093b7">Total Collection</th>
-			<th scope="col" style="background-color: #0093b7">Collection Rate</th>
-		</tr>
-	</thead>
-	<tbody class="wb_tbody">
-
-		<tr>
-			<td data-label="Barangay" style="background-color: #0093b7; color: white; font-weight: bold;">Total
-			</td>
-			<td data-label="Total Usage(Cu. Meter)" class="total_paid">
-			</td>
-			<td data-label="Total Receivables"></td>
-			<td data-label="Total Collection" class="total_due">
-
-			</td>
-			<td data-label="Collection Rate" class="rate"></td>
-		</tr>
-		<script>
-			jQuery(document).ready(function ($) {
-				$(".clickable-row").click(function () {
-					window.location = $(this).data("href");
-				});
-			});
-		</script>
-	</tbody>
-</table>
-Input Reading
