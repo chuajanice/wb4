@@ -143,6 +143,12 @@
             {% endfor %}
         </select>
 
+        <select id="rows-per-page" name="paginate_by" class="form-select" aria-label="Rows per page">
+            {% for size in page_size_options %}
+            <option value="{{ size }}" {% if size == paginate_by %}selected{% endif %}>{{ size }} per page</option>
+            {% endfor %}
+        </select>
+
         {% comment %} <button type="submit" class="btn btn-primary">Filter Records</button> {% endcomment %}
         <button type="submit" class="btn button2">Filter Records</button>
 

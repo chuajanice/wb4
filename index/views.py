@@ -4783,6 +4783,7 @@ def record_list(request):
         'last': range(paginator.num_pages - 3, paginator.num_pages),
         'five': range(1, 6),
         'paginate_by': paginate_by,
+        'page_size_options': [10, 25, 50, 100],
         'month_names': month_names,
         'months': months,
         'years': years,
