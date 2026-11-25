@@ -65,10 +65,10 @@ Unsettled Bills
 
                                 <tr>
                                     <th style="min-width: 100px;">Account ID</th>
-                                    <th style="min-width: 100px;" class='clickable-row' onclick="click" style="cursor: pointer;"data-href="?sort_field=lastname&sort_order={{ "sort_order|default:asc == asc ? desc : asc" }}&p={{paginate_by}}">Name</a></th>
-                                    <th style="min-width: 100px;" class='clickable-row' onclick="click" style="cursor: pointer;"data-href="?sort_field=meternumber&sort_order={{ "sort_order|default:asc == asc ? desc : asc" }}&p={{paginate_by}}">Meter Number</th>
-                                    <th style="min-width: 100px;" class='clickable-row' onclick="click" style="cursor: pointer;" data-href="?sort_field=installation_address&sort_order={{ "sort_order|default:asc == asc ? desc : asc" }}&p={{paginate_by}}">Address</th>
-                                    <th style="min-width: 100px;"class='clickable-row' onclick="click" style="cursor: pointer;" data-href="?sort_field=-current_bal&sort_order={{ "sort_order|default:asc == asc ? desc : asc" }}&p={{paginate_by}}">Current Balance (₱)</th>
+                                    <th style="min-width: 100px; cursor: pointer;" class='clickable-row' data-href="?sort_field=lastname&sort_order={% if sort_order == 'asc' %}desc{% else %}asc{% endif %}&p={{paginate_by}}">Name</th>
+                                    <th style="min-width: 100px; cursor: pointer;" class='clickable-row' data-href="?sort_field=meternumber&sort_order={% if sort_order == 'asc' %}desc{% else %}asc{% endif %}&p={{paginate_by}}">Meter Number</th>
+                                    <th style="min-width: 100px; cursor: pointer;" class='clickable-row' data-href="?sort_field=installation_address&sort_order={% if sort_order == 'asc' %}desc{% else %}asc{% endif %}&p={{paginate_by}}">Address</th>
+                                    <th style="min-width: 100px; cursor: pointer;" class='clickable-row' data-href="?sort_field=current_bal&sort_order={% if sort_order == 'asc' %}desc{% else %}asc{% endif %}&p={{paginate_by}}">Current Balance (₱)</th>
                                 </tr>
                             
                         </thead>
@@ -89,18 +89,18 @@ Unsettled Bills
                                 <td valign="top" colspan="5" class="dataTables_empty">No matching records found</td>
                             </tr>
                             {% endif %}
-                            <script src="{% static 'jquery/jquery.js' %}"></script>
-                            <script>
-                                jQuery(document).ready(function ($) {
-                                    $(".clickable-row").click(function () {
-                                        window.location = $(this).data("href");
-                                    });
-                                });
-                            </script>
                         </tbody>
                     </table>
                 </div>
             </div>
+            <script src="{% static 'jquery/jquery.js' %}"></script>
+            <script>
+                jQuery(document).ready(function ($) {
+                    $(".clickable-row").click(function () {
+                        window.location = $(this).data("href");
+                    });
+                });
+            </script>
             <div class="row">
                 <div class="d-flex justify-content-center">
                     <div class="dataTables_paginate paging_simple_numbers" id="table_paginate">
