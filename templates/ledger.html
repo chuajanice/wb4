@@ -84,6 +84,28 @@ Account Ledger
         background-color: #ffffff;
     }
 
+    /* Custom right-click context menu */
+    .context-menu {
+        display: none;
+        position: absolute;
+        background-color: #ffffff;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 5px;
+        z-index: 100;
+        box-shadow: 0 3px 6px 1px rgba(0, 0, 0, 0.1);
+    }
+
+    .context-menu-item {
+        padding: 5px 10px;
+        cursor: pointer;
+    }
+
+    .highlight {
+        --bs-table-accent-bg: var(--bs-table-hover-bg);
+        color: var(--bs-table-hover-color);
+    }
+
     /* Responsive and clean table styling */
     .table-responsive table {
         width: 100%;
@@ -410,12 +432,17 @@ Account Ledger
 <div id="ledger">
     <h1 class="text-center mb-3">Account Ledger</h1>
 
+    <!-- Custom right-click menu for reporting a billing row as an issue -->
+    <div id="contextMenu" class="context-menu" style="text-decoration: none;">
+        <div class="context-menu-item" id="customLink"></div>
+    </div>
+
     <!-- Horizontal Scroll -->
     <div class="table-responsive container-fluid p-0">
         <!-- Vertical Scroll for more than 10 rows -->
         <div class="col-12">
             <div class="{% if table|length > 10 %} table-scroll-vertical {% endif %}">
-                <table class="table table-hover table-bordered table-sm table-striped">
+                <table id="dtBasicExample2" class="table table-hover table-bordered table-sm table-striped">
                     <thead class="wb_thead" style="position: sticky; top: 0; background-color: white; z-index: 2;">
                         <tr>
                             <th>Billing Transaction ID</th>
