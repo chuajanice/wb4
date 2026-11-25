@@ -101,6 +101,11 @@ Consumer List
 	.dataTables_empty {
 		text-align: center;
 	}
+
+	.paginate_button a {
+		color: inherit;
+		text-decoration: none;
+	}
 </style>
 {% endblock style %}
 {% block script %}
@@ -110,7 +115,7 @@ Consumer List
 	<div class="col-5 align-middle">
 		<form action="{% url 'consumercreation' %}">
 			<button class="btn button2" type="submit">
-				<img style="width: 23px;" src="{% static '/images/person_add_FILL1_wght700_GRAD0_opsz48.svg' %}" /></i>
+				<img style="width: 23px;" src="{% static '/images/person_add_FILL1_wght700_GRAD0_opsz48.svg' %}" />
 				New
 				Consumer</button>
 		</form>
@@ -217,120 +222,82 @@ Consumer List
 					<div class="dataTables_paginate paging_simple_numbers" id="table_paginate">
 						<ul style="display: flex; padding-left: 0; list-style: none;">
 							{% if consumer_list.paginator.num_pages > 5 %}
-							{% if consumer_list.number < 5 %} {% if consumer_list.has_previous %} <a
-								href="?page={{ consumer_list.previous_page_number }}&search={{search}}&p={{paginate_by}}">
-								<li class="paginate_button page-item previous">Previous</li>
-								</a>
+							{% if consumer_list.number < 5 %} {% if consumer_list.has_previous %} <li class="paginate_button page-item previous"><a
+								href="?page={{ consumer_list.previous_page_number }}&search={{search}}&p={{paginate_by}}">Previous</a></li>
 								{% else %}
 								<li class="paginate_button disabled page-item previous">Previous</li>
 								{% endif %}
 								{% for i in five %}
 								{% if i == consumer_list.number %}
-								<a href="?page={{i}}&search={{search}}&p={{paginate_by}}">
-									<li class="paginate_button page-item active">{{i}}</li>
-								</a>
+								<li class="paginate_button page-item active"><a href="?page={{i}}&search={{search}}&p={{paginate_by}}">{{i}}</a></li>
 								{% else %}
-								<a href="?page={{i}}&search={{search}}&p={{paginate_by}}">
-									<li class="paginate_button page-item">{{i}}</li>
-								</a>
+								<li class="paginate_button page-item"><a href="?page={{i}}&search={{search}}&p={{paginate_by}}">{{i}}</a></li>
 								{% endif %}
 								{% endfor %}
 								<li class="paginate_button disabled page-item">...</li>
-								<a href="?page={{ consumer_list.paginator.num_pages }}&search={{search}}&p={{paginate_by}}">
-									<li class="paginate_button page-item">{{ consumer_list.paginator.num_pages }}</li>
-								</a>
+								<li class="paginate_button page-item"><a href="?page={{ consumer_list.paginator.num_pages }}&search={{search}}&p={{paginate_by}}">{{ consumer_list.paginator.num_pages }}</a></li>
 								{% if consumer_list.has_next %}
-								<a href="?page={{ consumer_list.next_page_number }}&search={{search}}&p={{paginate_by}}">
-									<li class="paginate_button page-item next">Next</li>
-								</a>
+								<li class="paginate_button page-item next"><a href="?page={{ consumer_list.next_page_number }}&search={{search}}&p={{paginate_by}}">Next</a></li>
 								{% else %}
 								<li class="paginate_button disabled page-item next">Next</li>
 								{% endif %}
 								{% else %}
 								{% if consumer_list.number > consumer_list.paginator.num_pages|add:'-3'%}
 								{% if consumer_list.has_previous %}
-								<a href="?page={{ consumer_list.previous_page_number }}&search={{search}}&p={{paginate_by}}">
-									<li class="paginate_button page-item previous">Previous</li>
-								</a>
+								<li class="paginate_button page-item previous"><a href="?page={{ consumer_list.previous_page_number }}&search={{search}}&p={{paginate_by}}">Previous</a></li>
 								{% else %}
 								<li class="paginate_button disabled page-item previous">Previous</li>
 								{% endif %}
-								<a href="?page=1&search={{search}}&p={{paginate_by}}">
-									<li class="paginate_button page-item">1</li>
-								</a>
+								<li class="paginate_button page-item"><a href="?page=1&search={{search}}&p={{paginate_by}}">1</a></li>
 								<li class="paginate_button disabled page-item">...</li>
 								{% for i in last %}
 								{% if i == consumer_list.number %}
-								<a href="?page={{i}}&search={{search}}&p={{paginate_by}}">
-									<li class="paginate_button page-item active">{{i}}</li>
-								</a>
+								<li class="paginate_button page-item active"><a href="?page={{i}}&search={{search}}&p={{paginate_by}}">{{i}}</a></li>
 								{% else %}
-								<a href="?page={{i}}&search={{search}}&p={{paginate_by}}">
-									<li class="paginate_button page-item">{{i}}</li>
-								</a>
+								<li class="paginate_button page-item"><a href="?page={{i}}&search={{search}}&p={{paginate_by}}">{{i}}</a></li>
 								{% endif %}
 								{% endfor %}
 								{% if consumer_list.number == consumer_list.paginator.num_pages %}
-								<a href="?page={{ consumer_list.paginator.num_pages }}&search={{search}}&p={{paginate_by}}">
-									<li class="paginate_button page-item active">{{ consumer_list.paginator.num_pages }}
-									</li>
-								</a>
+								<li class="paginate_button page-item active"><a href="?page={{ consumer_list.paginator.num_pages }}&search={{search}}&p={{paginate_by}}">{{ consumer_list.paginator.num_pages }}
+									</a></li>
 								{% else %}
-								<a href="?page={{ consumer_list.paginator.num_pages }}&search={{search}}&p={{paginate_by}}">
-									<li class="paginate_button page-item">{{ consumer_list.paginator.num_pages }}</li>
-								</a>
+								<li class="paginate_button page-item"><a href="?page={{ consumer_list.paginator.num_pages }}&search={{search}}&p={{paginate_by}}">{{ consumer_list.paginator.num_pages }}</a></li>
 								{% endif %}
 								{% if consumer_list.has_next %}
-								<a href="?page={{ consumer_list.next_page_number }}&search={{search}}&p={{paginate_by}}">
-									<li class="paginate_button page-item next">Next</li>
-								</a>
+								<li class="paginate_button page-item next"><a href="?page={{ consumer_list.next_page_number }}&search={{search}}&p={{paginate_by}}">Next</a></li>
 								{% else %}
 								<li class="paginate_button disabled page-item next">Next</li>
 								{% endif %}
 								{% else %}
 								{% if consumer_list.has_previous %}
-								<a href="?page={{ consumer_list.previous_page_number }}&search={{search}}&p={{paginate_by}}">
-									<li class="paginate_button page-item previous">Previous</li>
-								</a>
+								<li class="paginate_button page-item previous"><a href="?page={{ consumer_list.previous_page_number }}&search={{search}}&p={{paginate_by}}">Previous</a></li>
 								{% else %}
 								<li class="paginate_button disabled page-item previous">Previous</li>
 								{% endif %}
 								{% if consumer_list.number > 2 %}
-								<a href="?page=1&search={{search}}&p={{paginate_by}}">
-									<li class="paginate_button page-item">1</li>
-								</a>
+								<li class="paginate_button page-item"><a href="?page=1&search={{search}}&p={{paginate_by}}">1</a></li>
 								{% if consumer_list.number > 3 %}
 								<li class="paginate_button disabled page-item">...</li>
 								{% endif %}
 								{% endif %}
 
 								{% for num in consumer_list.paginator.page_range %}
-								{% if consumer_list.number == num %}<a href="?page={{ num }}">
-									<li class="paginate_button page-item active">
+								{% if consumer_list.number == num %}<li class="paginate_button page-item active"><a href="?page={{ num }}">
 										{{ num }}
-									</li>
-								</a>
-								{% elif num > consumer_list.number|add:'-2' and num < consumer_list.number|add:'2' %} <a
-									href="?page={{ num }}">
-									<li class="paginate_button page-item">{{ num }}</li>
-									</a>
+									</a></li>
+								{% elif num > consumer_list.number|add:'-2' and num < consumer_list.number|add:'2' %} <li class="paginate_button page-item"><a
+									href="?page={{ num }}">{{ num }}</a></li>
 									{% endif %}
 									{% endfor %}
 
 									{% if consumer_list.number < consumer_list.paginator.num_pages|add:'-2' %} <li
 										class="paginate_button disabled page-item">...</li>
-										<a href="?page={{ consumer_list.paginator.num_pages }}&search={{search}}&p={{paginate_by}}">
-											<li class="paginate_button page-item">{{ consumer_list.paginator.num_pages}}</li>
-										</a>
-										{% elif consumer_list.number < consumer_list.paginator.num_pages|add:'-1' %} <a
-											href="?page={{ consumer_list.paginator.num_pages }}&search={{search}}&p={{paginate_by}}">
-											<li class="paginate_button page-item">{{ consumer_list.paginator.num_pages}}</li>
-											</a>
+										<li class="paginate_button page-item"><a href="?page={{ consumer_list.paginator.num_pages }}&search={{search}}&p={{paginate_by}}">{{ consumer_list.paginator.num_pages}}</a></li>
+										{% elif consumer_list.number < consumer_list.paginator.num_pages|add:'-1' %} <li class="paginate_button page-item"><a
+											href="?page={{ consumer_list.paginator.num_pages }}&search={{search}}&p={{paginate_by}}">{{ consumer_list.paginator.num_pages}}</a></li>
 											{% endif %}
 											{% if consumer_list.has_next %}
-											<a href="?page={{ consumer_list.next_page_number }}&search={{search}}&p={{paginate_by}}">
-												<li class="paginate_button page-item next">Next</li>
-											</a>
+											<li class="paginate_button page-item next"><a href="?page={{ consumer_list.next_page_number }}&search={{search}}&p={{paginate_by}}">Next</a></li>
 											{% else %}
 											<li class="paginate_button page-item disabled next">Next</li>
 											{% endif %}
@@ -338,27 +305,19 @@ Consumer List
 											{% endif %}
 											{% else %}
 											{% if consumer_list.has_previous %}
-											<a href="?page={{ consumer_list.previous_page_number }}&search={{search}}&search={{search}}&p={{paginate_by}}">
-												<li class="paginate_button page-item previous">Previous</li>
-											</a>
+											<li class="paginate_button page-item previous"><a href="?page={{ consumer_list.previous_page_number }}&search={{search}}&p={{paginate_by}}">Previous</a></li>
 											{% else %}
 											<li class="paginate_button disabled page-item previous">Previous</li>
 											{% endif %}
 											{% for i in consumer_list.paginator.page_range %}
 											{% if i == consumer_list.number %}
-											<a href="?page={{i}}&search={{search}}&search={{search}}&p={{paginate_by}}">
-												<li class="paginate_button page-item active">{{i}}</li>
-											</a>
+											<li class="paginate_button page-item active"><a href="?page={{i}}&search={{search}}&p={{paginate_by}}">{{i}}</a></li>
 											{% else %}
-											<a href="?page={{i}}&search={{search}}&search={{search}}&p={{paginate_by}}">
-												<li class="paginate_button page-item">{{i}}</li>
-											</a>
+											<li class="paginate_button page-item"><a href="?page={{i}}&search={{search}}&p={{paginate_by}}">{{i}}</a></li>
 											{% endif %}
 											{% endfor %}
 											{% if consumer_list.has_next %}
-											<a href="?page={{ consumer_list.next_page_number }}&search={{search}}&search={{search}}&p={{paginate_by}}">
-												<li class="paginate_button page-item next">Next</li>
-											</a>
+											<li class="paginate_button page-item next"><a href="?page={{ consumer_list.next_page_number }}&search={{search}}&p={{paginate_by}}">Next</a></li>
 											{% else %}
 											<li class="paginate_button disabled page-item next">Next</li>
 											{% endif %}
@@ -429,10 +388,10 @@ Consumer List
 	function myFunction() {
 		// Declare variables 
 		var input, filter, table, tr, i, j, column_length, count_td;
-		column_length = document.getElementById('myTable').rows[0].cells.length;
+		column_length = document.getElementById('table').rows[0].cells.length;
 		input = document.getElementById("myInput");
 		filter = input.value.toUpperCase();
-		table = document.getElementById("myTable");
+		table = document.getElementById("table");
 		tr = table.getElementsByTagName("tr");
 		for (i = 1; i < tr.length; i++) { // except first(heading) row
 			count_td = 0;
